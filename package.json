@@ -1,0 +1,38 @@
+{
+  "name": "pintrip",
+  "version": "1.0.0",
+  "description": "> 状態: Draft / 2026-10-22   > これまでの協議に基づき復元した実装用仕様書。   > **確定**: 会話で決定済み / **暫定**: 実装提案 / **未決定**: 要確認。",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sea-cl0g/PinTrip.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Sea-cl0g/PinTrip/issues"
+  },
+  "homepage": "https://github.com/Sea-cl0g/PinTrip#readme",
+  "dependencies": {
+    "@dnd-kit/helpers": "^0.5.3",
+    "@dnd-kit/react": "^0.5.3",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "react-dropzone": "^20.1.4"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.2.1",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.6"
+  }
+}
