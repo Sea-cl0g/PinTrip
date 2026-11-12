@@ -1,6 +1,6 @@
 # 認証・ユーザー管理仕様
 
-[目次へ](./README.md) · [API](./api.md) · [セキュリティ](./security-operations.md)
+[目次へ](../README.md) · [API](./api.md) · [セキュリティ](./security-operations.md)
 
 ## 1. 確定方針
 
@@ -21,6 +21,8 @@
 6. アプリのセッションを発行する。
 
 GoogleのIDトークンを検証せずにクライアントのプロフィール情報だけでログインを成立させてはならない。
+
+**方針**: Google CloudのOAuth Client ID・許可オリジンとCloudflareの環境変数・シークレットはboo_manKnowが管理する。フロントのモックログインは本番のトークン検証・認可の代わりにならない。
 
 ## 3. 保存する情報（暫定）
 

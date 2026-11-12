@@ -1,6 +1,6 @@
 # バックエンド仕様
 
-[目次へ](./README.md) · [DB](./database.md) · [API](./api.md) · [認証](./authentication.md)
+[目次へ](../README.md) · [DB](./database.md) · [API](./api.md) · [認証](./authentication.md)
 
 ## 1. 責務
 

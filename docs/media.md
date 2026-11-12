@@ -1,6 +1,6 @@
 # 画像・メディア仕様
 
-[目次へ](./README.md) · [DB](./database.md) · [API](./api.md)
+[目次へ](../README.md) · [DB](./database.md) · [API](./api.md)
 
 ## 1. 確定要件
 

@@ -1,6 +1,7 @@
-# Travel Map SNS — 詳細仕様書
+# PinTrip — 詳細仕様書
 
-> 状態: Draft / 2026-10-22  
+> 状態: Draft / 2026-11-13
+>
 > これまでの協議に基づき復元した実装用仕様書。  
 > **確定**: 会話で決定済み / **暫定**: 実装提案 / **未決定**: 要確認。
 
@@ -9,7 +10,7 @@
 | 文書 | 内容 |
 |---|---|
 | [Product requirements](./docs/requirements.md) | 機能要件、スコープ、公開ルール |
-| [Frontend](./docs/frontend.md) | 画面構成、UI、操作、状態 |
+| [Frontend](./docs/frontend.md) | 画面構成、共通UI・テーマ・フォントのルール、操作、状態 |
 | [Backend](./docs/backend.md) | サーバー責務、認可、処理フロー |
 | [Database](./docs/database.md) | D1テーブル、主キー、外部キー、削除規則 |
 | [API](./docs/api.md) | HTTPエンドポイント、入出力、エラー |
