@@ -1,6 +1,7 @@
 name: "開発タスク"
 description: "機能の実装やUIの作成、既存機能の改善など"
 title: "タイトル"
+type: Task
 
 body:
   - type: textarea
