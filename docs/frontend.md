@@ -98,27 +98,22 @@ PCを優先して開発。左端にメニューバー、右側にメイン画面
 - **確定**: 共通テーマ・フォント・基本スタイルはozakoが管理し、全員が無制限にグローバルCSSを変更しない。`<style>` タグに統一するという意味ではない。
 - **提案**: 複雑な独自デザインが必要な場合のみ機能フォルダ内の `*.module.css` を使う。CSS Modulesの全面採用は未決定。ロゴ専用フォント、厳密な文字サイズ・ウェイト、ダークモードも未決定。
 
-## 5. フロントエンド構成（提案）
+## 5. フロントエンド構成
 
 ```text
 src/
-  app/              # アプリ全体のレイアウト・画面切替
-  components/ui/    # shadcn/uiの基本部品
-  components/layout/
-  features/
-    map/
-    pins/
-    plans/
-    auth/
-    reports/
-  lib/api/          # 共通APIクライアント・型
-  mocks/            # 開発用モックの共通ロジック
-  styles/globals.css
-public/data/        # 静的JSONのモック候補
+  main.tsx          # Reactのエントリーポイント
+  App.tsx           # ルーティング・アプリ全体の設定
+  pages/            # ページ単位のコンポーネント
+  components/       # ページ内で使用するUI・共通部品
+  index.css         # 共通CSS・Tailwind CSS
+
+public/
+  data/             # JSON
 ```
 
 - React + TypeScript。ルーティングにはReact Routerを使用する。具体的なURL・画面遷移・戻る操作は未決定。
-- 物理配置は未決定。共通UI・テーマはozako、投稿UIはyua、地図はozako、計画はha、認証連携とAPI契約はboo_manKnowが主に担当する。通報の担当は要確認。
+- 共通UI・テーマはozako、投稿UIはyua、地図はozako、計画はha、認証連携とAPI契約はboo_manKnowが主に担当する。通報の担当は要確認。
 - **提案**: ピンのフロント側取得・保持をyuaに集約し、`MapView` はProps等でピンを受け取って描画し、選択を親に通知する。画面固有の取得責務と見た目は必要に応じて分離する。
 - 同じ意味の `Pin` 型を機能ごとに重複定義しない。型変更はboo_manKnowとyuaが確認し、ozako・haに知らせる。共有状態の保管場所は未決定。
 - **確定**: 画像アップロードにはUppy、並び替えにはdnd-kit、アイコンにはLucide React、入力フォームにはReact Hook Form + Zod + shadcn/ui、日付にはdate-fnsを使用する。採用技術の一覧は [技術](./technology.md) を参照。
