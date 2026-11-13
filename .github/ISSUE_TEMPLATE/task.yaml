@@ -1,3 +1,42 @@
-name: "タスク"
+name: "開発タスク"
 description: "機能の実装やUIの作成、既存機能の改善など"
 title: ""
+
+body:
+  - type: textarea
+    id: overview
+    attributes:
+      label: "概要"
+      description: "何を作る・変更するのか簡潔に記載する"
+      placeholder: "スターボタンを共通コンポーネント化する"
+    validations:
+      required: true
+
+  - type: textarea
+    id: tasks
+    attributes:
+      label: "作業内容"
+      description: "具体的な実装内容を記載する"
+      placeholder: |
+        - スターボタンをファイルに切り出す
+        - クリック状態によって表示を切り替える
+        - count、isLiked、onClickをpropsとして受け取る
+    validations:
+      required: true
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: "注意事項"
+      description: "実装上の制約や参考資料などを記載する"
+      placeholder: |
+        - shadcn/ui, Lucide Reactを組み合わせて実装してください
+
+
+  - type: textarea
+    id: workflow
+    attributes:
+      label: "作業方法"
+      description: "作業前に以下の手順書を確認してください。"
+      value: |
+        - [作業方法](https://github.com/Sea-cl0g/PinTrip/blob/main/how-to/作業方法.md)
