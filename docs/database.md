@@ -20,7 +20,7 @@
 users (1) ── (N) pins (1) ── (N) pin_images
    │               │
    │               ├── (N) pin_likes (N) ── users
-   │               └── (N) plan_pins (N) ── plans (N) ── (1) users
+   │               └── (N) plan_items (N) ── plans (N) ── (1) users
    ├── (N) sessions
    └── (N) reports
 
@@ -95,17 +95,19 @@ users (1) ── (N) pins (1) ── (N) pin_images
 
 旅行計画の画像の枚数・アップロード規則は未決定。
 
-### plan_pins
+### plan_items
+
+ピンとひとコマを共通の項目として保存する**提案**。テーブル名・カラム名・制約は未承認。
 | カラム | 型 | 制約・説明 |
 |---|---|---|
-| `id` | INTEGER | PK。欠損ピンの枠を識別 |
+| `id` | INTEGER | PK。計画内の項目そのものを識別し、欠損ピンの枠も識別 |
 | `plan_id` | INTEGER | FK → plans.id、ON DELETE CASCADE |
-| `pin_id` | INTEGER | FK → pins.id、ON DELETE SET NULL、NULL可 |
+| `type` | TEXT | `pin` / `moment`（ひとコマ） |
 | `position` | INTEGER | NOT NULL、表示順 |
-| `stay_minutes` | INTEGER | 滞在時間、任意 |
-| `travel_minutes` | INTEGER | 移動時間、任意 |
+| `duration_minutes` | INTEGER | 共通の時間を任意の所要時間（分）とする案 |
+| `pin_id` | INTEGER | ピンの参照先。FK → pins.id、ON DELETE SET NULL、NULL可 |
+| `title` | TEXT | ひとコマの名前。ピンのタイトルは参照先から取得 |
 
-`travel_minutes` を「直前のピンからの移動時間」とするかは未決定。`UNIQUE(plan_id, pin_id)` は重複登録可否が決まるまで設定しない。
 
 ### pin_likes
 | カラム | 型 | 制約・説明 |
@@ -135,8 +137,8 @@ users (1) ── (N) pins (1) ── (N) pin_images
 
 | 操作 | 関連データ |
 |---|---|
-| ピン削除 | `pin_images`・`pin_likes`削除、`plan_pins.pin_id = NULL`、R2画像削除 |
-| 計画削除 | `plan_pins`削除、ピン自体は保持、計画画像削除 |
+| ピン削除 | `pin_images`・`pin_likes`削除、ピン項目の `plan_items.pin_id = NULL`、R2画像削除 |
+| 計画削除 | `plan_items`削除、ピン自体は保持、計画画像削除 |
 | 退会 | 所有ピン・計画・画像・セッション・いいね等を削除。第三者の計画には欠損ピン枠を残す |
 
 **重要**: 退会時の削除順序と `users → pins` の外部キー動作は実装前に確定すること。
@@ -147,7 +149,7 @@ users (1) ── (N) pins (1) ── (N) pin_images
 - `pins(status, latitude, longitude)` — 地図範囲検索の候補
 - `pins(user_id, status)` — 自分の投稿
 - `plans(user_id, status)` — 自分の計画
-- `plan_pins(plan_id, position)` — 計画の並び順
+- `plan_items(plan_id, position)` — 計画の並び順
 - `pin_likes(pin_id)` — いいね集計
 
 本文・ハッシュタグ検索は小規模ならLIKE、必要に応じてFTS5等を検討する。地図検索のインデックス方式、ページング、検索性能は負荷試験後に確定。
