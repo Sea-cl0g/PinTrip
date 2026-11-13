@@ -18,9 +18,15 @@
 | CSS | Tailwind CSS | 確定 |
 | UIコンポーネント | shadcn/ui | 確定 |
 | フォント | LINE Seed JP / Zen Maru Gothic | 確定 |
-| フォーム・検証 | React Hook Form / Zod | 未決定 |
-| アップロードUI | react-dropzone / Uppy | 未決定 |
-| 並び替え・アイコン | dnd kit / Lucide React | 未決定 |
+| ルーティング | React Router | 必須・確定 |
+| 絵文字の処理 | emoji-regex | 確定 |
+| 絵文字ピッカー | emoji-picker-react | 確定 |
+| 並び替え | dnd-kit | 確定 |
+| アップロード | Uppy | 確定 |
+| 画像ビューア | yet-another-react-lightbox | 確定 |
+| アイコン | Lucide React | 確定 |
+| 入力フォーム・検証 | React Hook Form + Zod + shadcn/ui | 確定 |
+| 日付 | date-fns | 確定 |
 | ビルド | Vite | 確認 |
 | パッケージ管理 | npm | 確定 |
 | ソース管理 | GitHub | 確定 |
