@@ -1,0 +1,49 @@
+[
+  {
+    "id": 201,
+    "title": "京都・東山のんびり散歩",
+    "body": "お寺と川辺をめぐりながら、京都の街を歩くサンプルコース。",
+    "emoji": "🍵",
+    "status": "published",
+    "publishedAt": "2026-11-01T10:00:00Z",
+    "images": [],
+    "author": { "id": 1, "handle": "sample_sora", "displayName": "そら（サンプル）" },
+    "items": [
+      { "id": 301, "type": "pin", "position": 0, "durationMinutes": 90, "pinId": 101 },
+      { "id": 302, "type": "moment", "position": 1, "durationMinutes": 45, "title": "お昼休憩" },
+      { "id": 303, "type": "pin", "position": 2, "durationMinutes": 30, "pinId": 104 }
+    ]
+  },
+  {
+    "id": 202,
+    "title": "東京の街歩き",
+    "body": "東京駅から浅草、上野へ。移動もひとコマにしたサンプルコース。",
+    "emoji": "🗼",
+    "status": "published",
+    "publishedAt": "2026-11-03T08:30:00Z",
+    "images": [],
+    "author": { "id": 3, "handle": "sample_ao", "displayName": "あお（サンプル）" },
+    "items": [
+      { "id": 304, "type": "pin", "position": 0, "durationMinutes": 30, "pinId": 105 },
+      { "id": 305, "type": "moment", "position": 1, "durationMinutes": 30, "title": "電車で移動" },
+      { "id": 306, "type": "pin", "position": 2, "durationMinutes": 60, "pinId": 106 },
+      { "id": 307, "type": "pin", "position": 3, "durationMinutes": null, "pinId": 107 }
+    ]
+  },
+  {
+    "id": 203,
+    "title": "関西の公園めぐり",
+    "body": "奈良と大阪をめぐるコース。削除されたピンの表示確認にも使えるサンプル。",
+    "emoji": "🚃",
+    "status": "published",
+    "publishedAt": "2026-11-05T04:00:00Z",
+    "images": [],
+    "author": { "id": 2, "handle": "sample_nagi", "displayName": "なぎ（サンプル）" },
+    "items": [
+      { "id": 308, "type": "pin", "position": 0, "durationMinutes": 60, "pinId": 110 },
+      { "id": 309, "type": "moment", "position": 1, "durationMinutes": 60, "title": "電車で移動" },
+      { "id": 310, "type": "pin", "position": 2, "durationMinutes": null, "pinId": null },
+      { "id": 311, "type": "pin", "position": 3, "durationMinutes": 60, "pinId": 109 }
+    ]
+  }
+]

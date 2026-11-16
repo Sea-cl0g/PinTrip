@@ -127,6 +127,21 @@ public/
 - 静的JSONはGETの試作向けで、作成・編集・削除やログインは再現できない。必要に応じた状態付きTypeScriptモックやMSWは提案であり、方式は未決定。公開される `public/` には秘密情報・実個人データ・認証情報を置かない。
 - **提案**: 以下の情報をProps・コールバック等で明示的に受け渡す。データの所有者・共有状態の配置は関係者間で事前に合意する。
 
+#### テストデータ
+
+- [公開ピン](../public/data/pins.json)と[公開旅行計画](../public/data/plans.json)は架空のサンプル。画面からはJSONを直接読まず、[共通のモック取得関数](../src/api/mock-api.ts)を使う。
+- モックと本番APIの[クライアント](../src/api/client.ts)は、[共有型](../src/types.ts)の `ApiClient` に従う。本番クライアントは未実装で、呼び出すとエラーになる。
+- `getPins()` はピン配列、`getPlans()` は計画配列を返す。計画のJSONはピンを `pinId` で参照し、取得結果のピン項目は `pin` に展開される。削除済みピンの確認用に `pin: null` の項目もある。
+- [共有型](../src/types.ts)、投稿者情報、計画項目、一覧形式はAPI契約確定までの暫定形。画像の形式は未決定のため、サンプルは画像なし。下書き、認証、作成・編集・削除は再現しない。
+- モジュールはモック専用であり、実APIが失敗した際のフォールバックではない。
+
+```ts
+import { getPins, getPlans } from "@/api/mock-api";
+
+const pins = await getPins();
+const plans = await getPlans();
+```
+
 
 ## 6. 例外・空状態
 
