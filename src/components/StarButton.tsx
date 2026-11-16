@@ -13,15 +13,12 @@ export function StarButton({ count, isLiked, onClick }: StarButtonProps) {
   return (
     <Button
       type="button"
-      variant="outline"
+      variant="ghost"
       size="sm"
       aria-label={isLiked ? "いいねを解除" : "いいねする"}
       aria-pressed={isLiked}
       onClick={onClick}
-      className={cn(
-        "tabular-nums",
-        isLiked && "border-amber-400 text-amber-600 hover:text-amber-700",
-      )}
+      className="tabular-nums"
     >
       <Star aria-hidden="true" className={cn(isLiked && "fill-current")} />
       <span>{count}</span>
