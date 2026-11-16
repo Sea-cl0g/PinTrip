@@ -10,6 +10,8 @@ body:
       label: "概要"
       description: "何を作る・変更するのか簡潔に記載する"
       placeholder: "スターボタンを共通コンポーネント化する"
+      value: |
+        - 
     validations:
       required: true
 
@@ -22,6 +24,8 @@ body:
         - スターボタンをファイルに切り出す
         - クリック状態によって表示を切り替える
         - count、isLiked、onClickをpropsとして受け取る
+      value: |
+        - 
     validations:
       required: true
 
@@ -32,6 +36,8 @@ body:
       description: "実装上の制約や参考資料などを記載する"
       placeholder: |
         - shadcn/ui, Lucide Reactを組み合わせて実装してください
+      value: |
+        - 
 
 
   - type: textarea
