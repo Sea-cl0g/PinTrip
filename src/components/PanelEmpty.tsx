@@ -13,7 +13,7 @@ export function MapDetailEmpty({ onCreatePost, onCreatePlan }: MapDetailEmptyPro
   return (
     <Empty className="min-h-full p-6">
       <EmptyHeader>
-        <EmptyMedia variant="icon" className="bg-teal-100 text-teal-800 dark:bg-teal-950 dark:text-teal-200">
+        <EmptyMedia variant="icon" className="bg-primary/10 text-primary">
           <MapPin aria-hidden="true" />
         </EmptyMedia>
         <EmptyTitle>地図のピンを選択</EmptyTitle>
@@ -25,11 +25,11 @@ export function MapDetailEmpty({ onCreatePost, onCreatePlan }: MapDetailEmptyPro
           <span className="shrink-0">または</span>
           <Separator className="min-w-0 flex-1" />
         </div>
-        <Button variant="outline" className="w-full rounded-xl border-teal-700/30 text-teal-800 disabled:opacity-75 dark:text-teal-200" disabled={!onCreatePost} onClick={onCreatePost}>
+        <Button variant="default" className="w-full" disabled={!onCreatePost} onClick={onCreatePost}>
           <SquarePen aria-hidden="true" />
           新しい投稿を作成
         </Button>
-        <Button variant="outline" className="w-full rounded-xl border-teal-700/30 text-teal-800 disabled:opacity-75 dark:text-teal-200" disabled={!onCreatePlan} onClick={onCreatePlan}>
+        <Button variant="outline" className="w-full" disabled={!onCreatePlan} onClick={onCreatePlan}>
           <CalendarDays aria-hidden="true" />
           旅行計画を作成
         </Button>

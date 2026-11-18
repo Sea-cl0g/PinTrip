@@ -61,9 +61,10 @@ export function TopSidebar({ view, onViewChange, onCreatePost }: TopSidebarProps
               <SidebarMenuButton
                 aria-label="投稿を作成"
                 tooltip="投稿を作成"
+                variant="primary"
                 aria-disabled={!onCreatePost}
                 onClick={onCreatePost}
-                className="h-10 bg-teal-700 font-semibold text-white hover:bg-teal-800 hover:text-white aria-disabled:opacity-80"
+                className="h-10 font-semibold aria-disabled:opacity-80"
               >
                 <Plus aria-hidden="true" />
                 <span className="group-data-[collapsible=icon]:hidden">投稿を作成</span>
