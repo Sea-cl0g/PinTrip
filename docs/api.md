@@ -81,16 +81,20 @@
 | PATCH | `/plans/{id}` | 所有計画編集 | 所有者 |
 | POST | `/plans/{id}/publish` | 公開条件を検証して公開 | 所有者 |
 | DELETE | `/plans/{id}` | 計画削除 | 所有者 |
-| POST | `/plans/{id}/pins` | ピン追加 | 所有者 |
-| PATCH | `/plans/{id}/pins/{entryId}` | 並び順・滞在/移動時間更新 | 所有者 |
-| DELETE | `/plans/{id}/pins/{entryId}` | 計画から参照解除 | 所有者 |
+| POST | `/plans/{id}/items` | ピンまたはひとコマを追加 | 所有者 |
+| PATCH | `/plans/{id}/items/{entryId}` | 計画項目の編集 | 所有者 |
+| DELETE | `/plans/{id}/items/{entryId}` | 計画から項目を削除 | 所有者 |
 
-`entryId` は `plan_pins.id`。公開計画への下書きピン追加、下書きピンを含む計画の公開は `409`。
+項目共通のAPIは提案で、`entryId` は `plan_items.id` を示す案。並び替えのAPI・更新方法、ひとコマの編集・削除操作は未決定。公開計画への下書きピン追加、下書きピンを含む計画の公開は `409`。
 
 **暫定追加リクエスト**:
 
 ```json
-{"pinId":101,"position":0,"stayMinutes":60,"travelMinutes":15}
+{"type":"pin","pinId":101,"position":0,"durationMinutes":60}
+```
+
+```json
+{"type":"moment","title":"移動","position":1,"durationMinutes":30}
 ```
 
 欠損ピンはレスポンスの `pin: null` で表現する案。
