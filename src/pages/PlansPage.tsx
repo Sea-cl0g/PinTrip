@@ -1,7 +1,10 @@
+import { MapDetailPanel } from "@/components/MapDetailPanel";
+import { MapWorkspace } from "@/components/MapWorkspace";
+
 export default function PlansPage() {
   return (
-    <main>
-      <h1>旅行計画</h1>
-    </main>
+    <MapWorkspace>
+      <MapDetailPanel />
+    </MapWorkspace>
   );
 }

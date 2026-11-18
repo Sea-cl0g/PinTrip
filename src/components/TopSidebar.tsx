@@ -1,4 +1,5 @@
 import { CalendarDays, List, Map, Plus, Settings } from "lucide-react";
+import { Link, matchPath, useLocation } from "react-router";
 
 import {
   Sidebar,
@@ -11,23 +12,21 @@ import {
   SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { pages } from "@/navigation";
 
-export const topViews = [
-  { id: "map", label: "マップ", icon: Map },
-  { id: "pins", label: "投稿一覧", icon: List },
-  { id: "plans", label: "旅行計画", icon: CalendarDays },
+const topViews = [
+  { ...pages.map, icon: Map },
+  { ...pages.pins, icon: List },
+  { ...pages.plans, icon: CalendarDays },
 ] as const;
 
-export type HomeView = (typeof topViews)[number]["id"];
-
 type TopSidebarProps = {
-  view: HomeView;
-  onViewChange: (view: HomeView) => void;
   onCreatePost?: () => void;
 };
 
-export function TopSidebar({ view, onViewChange, onCreatePost }: TopSidebarProps) {
+export function TopSidebar({ onCreatePost }: TopSidebarProps) {
   const { isMobile, open, openMobile, setOpenMobile } = useSidebar();
+  const { pathname } = useLocation();
   const expanded = isMobile ? openMobile : open;
 
   return (
@@ -39,24 +38,25 @@ export function TopSidebar({ view, onViewChange, onCreatePost }: TopSidebarProps
       <SidebarContent>
         <nav aria-label="メインメニュー" className="px-2">
           <SidebarMenu>
-            {topViews.map(({ id, label, icon: Icon }) => (
-              <SidebarMenuItem key={id}>
-                <SidebarMenuButton
-                  isActive={view === id}
-                  aria-current={view === id ? "page" : undefined}
-                  aria-label={label}
-                  tooltip={label}
-                  className="h-10 font-medium data-active:bg-teal-100 data-active:text-teal-900 dark:data-active:bg-teal-950 dark:data-active:text-teal-100"
-                  onClick={() => {
-                    onViewChange(id);
-                    setOpenMobile(false);
-                  }}
-                >
-                  <Icon aria-hidden="true" />
-                  <span className="group-data-[collapsible=icon]:hidden">{label}</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            ))}
+            {topViews.map(({ path, label, icon: Icon }) => {
+              const isActive = Boolean(matchPath({ path, end: true }, pathname));
+              return (
+                <SidebarMenuItem key={path}>
+                  <SidebarMenuButton
+                    render={<Link to={path} />}
+                    isActive={isActive}
+                    aria-current={isActive ? "page" : undefined}
+                    aria-label={label}
+                    tooltip={label}
+                    className="h-10 font-medium data-active:bg-teal-100 data-active:text-teal-900 dark:data-active:bg-teal-950 dark:data-active:text-teal-100"
+                    onClick={() => setOpenMobile(false)}
+                  >
+                    <Icon aria-hidden="true" />
+                    <span className="group-data-[collapsible=icon]:hidden">{label}</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              );
+            })}
             <SidebarMenuItem className="mt-4">
               <SidebarMenuButton
                 aria-label="投稿を作成"
