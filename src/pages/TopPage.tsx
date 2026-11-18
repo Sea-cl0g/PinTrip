@@ -1,6 +1,7 @@
 import { useState, type CSSProperties, type FormEvent, type ReactNode } from "react";
 import { Bell, CircleHelp, Search, SlidersHorizontal } from "lucide-react";
 
+import { MapDetailEmpty } from "@/components/PanelEmpty";
 import { MapDetailPanel } from "@/components/MapDetailPanel";
 import { TopSidebar, topViews, type HomeView } from "@/components/TopSidebar";
 import { Button } from "@/components/ui/button";
@@ -98,8 +99,8 @@ export default function TopPage({
               <section aria-label="地図" className="relative min-h-0 min-w-0 overflow-hidden rounded-2xl border bg-muted">
                 {map}
               </section>
-              <MapDetailPanel onCreatePost={onCreatePost} onCreatePlan={onCreatePlan}>
-                {detail}
+              <MapDetailPanel>
+                {detail ?? <MapDetailEmpty onCreatePost={onCreatePost} onCreatePlan={onCreatePlan} />}
               </MapDetailPanel>
             </div>
           ) : (
