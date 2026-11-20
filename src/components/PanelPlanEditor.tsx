@@ -309,6 +309,7 @@ function PlanEditorForm({ plan, onBack, onSave }: PanelPlanEditorProps) {
             <div className="space-y-2">
               <label htmlFor={`${formId}-moment`}>ひとコマの名前</label>
               <Combobox
+                defaultOpen
                 items={momentSuggestions}
                 inputValue={momentTitle}
                 onInputValueChange={(value, details) => {
@@ -318,7 +319,12 @@ function PlanEditorForm({ plan, onBack, onSave }: PanelPlanEditorProps) {
                   if (typeof value === "string") setMomentTitle(value);
                 }}
               >
-                <ComboboxInput id={`${formId}-moment`} className={`w-full ${inputClass}`} placeholder="候補を選択、または入力" />
+                <ComboboxInput
+                  id={`${formId}-moment`}
+                  autoFocus
+                  className={`w-full ${inputClass}`}
+                  placeholder="候補を選択、または入力"
+                />
                 <ComboboxContent>
                   <ComboboxEmpty>入力した名前で追加できます。</ComboboxEmpty>
                   <ComboboxList>
@@ -328,6 +334,11 @@ function PlanEditorForm({ plan, onBack, onSave }: PanelPlanEditorProps) {
               </Combobox>
               <Button type="button" variant="outline" disabled={!momentTitle.trim()} onClick={addMoment}>行程に追加</Button>
             </div>
+          )}
+          {items.length === 0 && (
+            <p className="text-xs text-muted-foreground">
+              ピンを選んで「ピンを追加」を押すか、「ひとコマを追加」で行程を作り始めましょう。
+            </p>
           )}
           {items.length > 1 && (
             <p className="flex items-center gap-1 text-xs text-muted-foreground">
