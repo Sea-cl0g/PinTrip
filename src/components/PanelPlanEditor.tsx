@@ -27,6 +27,7 @@ const suggestedEmojis = [
   { emoji: "☕", label: "カフェ" }, { emoji: "📷", label: "写真" },
   { emoji: "🌸", label: "桜" }, { emoji: "🍜", label: "ラーメン" },
   { emoji: "🗼", label: "タワー" },
+  { emoji: "🚃", label: "電車" }, { emoji: "🏖️", label: "ビーチ" },
 ];
 const maxImageSize = 5 * 1024 * 1024;
 const inputClass = "border-border bg-card";
