@@ -32,7 +32,8 @@
 | POST | `/auth/google` | Google IDトークン検証・ログイン | 不要 |
 | GET | `/auth/me` | 現在のユーザー | 必要 |
 | POST | `/auth/logout` | セッション破棄 | 必要 |
-| POST | `/users/onboarding` | 初回handle・表示名設定 | 必要 |
+| POST | `/users/onboarding` | 初回の表示名設定 | 必要 |
+| PATCH | `/users/me` | 表示名の変更 | 必要 |
 | DELETE | `/users/me` | 退会・所有データ削除 | 必要 |
 
 初回登録とログインのAPI分離方式は未決定。
@@ -99,19 +100,17 @@
 
 欠損ピンはレスポンスの `pin: null` で表現する案。
 
-## 5. 画像・通報・ブックマーク
+## 5. 画像・ブックマーク
 
 | Method | Path | 用途 | 状態 |
 |---|---|---|---|
 | POST | `/pins/{id}/images` | 画像追加 | 暫定 |
 | DELETE | `/pins/{id}/images/{imageId}` | 画像削除 | 暫定 |
 | PATCH | `/pins/{id}/images/order` | 画像順変更 | 暫定 |
-| POST | `/reports` | 通報記録 | 暫定 |
-| GET | `/admin/reports` | 管理者の通報確認 | 未決定 |
 | PUT/DELETE | `/pins/{id}/bookmark` | 投稿ブックマーク | 将来 |
 | PUT/DELETE | `/plans/{id}/bookmark` | 計画ブックマーク | 将来 |
 
-計画画像のAPI、R2への直接アップロードかサーバー経由か、通報対象、管理者認証は未決定。
+計画画像のAPI、R2への直接アップロードかサーバー経由か、管理者認証は未決定。
 
 ## 6. 入力検証とページング
 

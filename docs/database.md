@@ -10,7 +10,7 @@
 - 画像の実体はD1に入れず、R2に保存する案。
 - 原則 `INTEGER PRIMARY KEY` を採用。公開URLに連番IDを使うかは未決定。
 - `user_id`、`pin_id`、`plan_id` 等は外部キー。
-- `google_sub`、ユーザーの公開用 `handle` は一意。
+- `google_sub` は一意。公開用のユーザーID（handle）は持たない。
 - 外部キーによる削除と画像削除を混同しない。
 - **方針**: boo_manKnowがDB・API契約を管理し、投稿のyua、地図のozako、計画のhaと必要なデータ項目を協議・レビューする。以下のスキーマ、画像構造、IDや日時等はこれによって確定されたものではない。
 
@@ -21,8 +21,7 @@ users (1) ── (N) pins (1) ── (N) pin_images
    │               │
    │               ├── (N) pin_likes (N) ── users
    │               └── (N) plan_items (N) ── plans (N) ── (1) users
-   ├── (N) sessions
-   └── (N) reports
+   └── (N) sessions
 
 [将来] users ── pin_bookmarks / plan_bookmarks
 ```
@@ -34,8 +33,7 @@ users (1) ── (N) pins (1) ── (N) pin_images
 |---|---|---|
 | `id` | INTEGER | PK |
 | `google_sub` | TEXT | NOT NULL, UNIQUE。Googleの安定識別子 |
-| `handle` | TEXT | NOT NULL, UNIQUE、変更不可 |
-| `display_name` | TEXT | NOT NULL、重複可 |
+| `display_name` | TEXT | NOT NULL、重複可、設定画面から変更可 |
 | `created_at` | TEXT | NOT NULL、UTC時刻 |
 
 メールアドレス、パスワード、アクセストークンの永続保存は原則不要（暫定）。
@@ -116,19 +114,6 @@ users (1) ── (N) pins (1) ── (N) pin_images
 | `pin_id` | INTEGER | FK → pins.id |
 | `created_at` | TEXT | いいね日時 |
 | **主キー** | `(user_id, pin_id)` | 複合PK（暫定） |
-
-### reports
-| カラム | 型 | 制約・説明 |
-|---|---|---|
-| `id` | INTEGER | PK |
-| `reporter_user_id` | INTEGER | FK → users.id（暫定） |
-| `target_type` | TEXT | `pin` / `plan` 等（対象未決定） |
-| `target_id` | INTEGER | 対象ID |
-| `reason` | TEXT | 通報理由 |
-| `status` | TEXT | `open` / `reviewed` 等（暫定） |
-| `created_at` | TEXT | 通報日時 |
-
-`target_type` + `target_id` の方式ではDB外部キーで対象を保証できない。ピン専用・計画専用テーブルに分ける案もあり、未決定。
 
 ### ブックマーク（将来用）
 `pin_bookmarks(user_id, pin_id, created_at)` と `plan_bookmarks(user_id, plan_id, created_at)` を別表で追加する案。各 `(user_id, 対象ID)` を複合PKとする。
