@@ -6,7 +6,7 @@ type MapDetailPanelProps = {
 
 export function MapDetailPanel({ children }: MapDetailPanelProps) {
   return (
-    <aside className="min-h-0 overflow-auto rounded-2xl border bg-card shadow-sm">
+    <aside className="h-full min-h-0 overflow-auto rounded-2xl border bg-card shadow-sm">
       {children}
     </aside>
   );
