@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
 
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
+import { useIsMobile } from "@/hooks/use-mobile";
 import mapImage from "@/images/map-placeholder.png";
 
 type MapWorkspaceProps = {
@@ -11,12 +13,33 @@ export function MapWorkspace({
   map = <img src={mapImage} alt="地図のプレビュー" className="size-full object-cover" />,
   children,
 }: MapWorkspaceProps) {
+  const isMobile = useIsMobile();
+
   return (
-    <div className="grid min-h-0 flex-1 grid-rows-[minmax(0,1fr)_minmax(0,15rem)] gap-2 px-2 pb-2 md:grid-cols-[minmax(0,1fr)_17rem] md:grid-rows-[minmax(0,1fr)] lg:grid-cols-[minmax(0,1fr)_20rem]">
-      <section aria-label="地図" className="relative min-h-0 min-w-0 overflow-hidden rounded-2xl border bg-muted">
-        {map}
-      </section>
-      {children}
-    </div>
+    <ResizablePanelGroup
+      orientation={isMobile ? "vertical" : "horizontal"}
+      className="min-h-0 flex-1 px-2 pb-2"
+    >
+      <ResizablePanel id="map">
+        <section aria-label="地図" className="relative size-full overflow-hidden rounded-2xl border bg-muted">
+          {map}
+        </section>
+      </ResizablePanel>
+      <ResizableHandle
+        aria-label="詳細パネルの幅を調整"
+        withHandle
+        disabled={isMobile}
+        className="invisible shrink-0 rounded-sm aria-[orientation=horizontal]:h-2 md:visible md:w-2 md:bg-transparent md:hover:bg-accent md:[&>div]:bg-muted-foreground"
+      />
+      <ResizablePanel
+        id="detail"
+        defaultSize={isMobile ? "15rem" : "20rem"}
+        minSize={isMobile ? "0%" : "14rem"}
+        maxSize={isMobile ? "65%" : "60%"}
+        groupResizeBehavior="preserve-pixel-size"
+      >
+        {children}
+      </ResizablePanel>
+    </ResizablePanelGroup>
   );
 }
