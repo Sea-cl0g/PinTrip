@@ -33,7 +33,7 @@ export function MapWorkspace({
       />
       <ResizablePanel
         id="detail"
-        defaultSize={isMobile ? "15rem" : "20rem"}
+        defaultSize={isMobile ? "15rem" : "24rem"}
         minSize={isMobile ? "0%" : "14rem"}
         maxSize={isMobile ? "65%" : "60%"}
         groupResizeBehavior="preserve-pixel-size"
