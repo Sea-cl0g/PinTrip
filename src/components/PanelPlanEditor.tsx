@@ -394,7 +394,7 @@ function SortablePlanItem({ item, index, onRemove, onDurationChange }: {
       className={`relative flex items-center gap-2 rounded-xl border p-2 shadow-sm
         after:pointer-events-none after:absolute after:top-full after:left-6 after:h-4 after:w-px after:bg-primary/55
         before:pointer-events-none before:absolute before:top-[calc(100%+0.3rem)] before:left-[1.25rem] before:z-10 before:size-2 before:rounded-full before:border before:border-primary before:bg-card
-        last:before:hidden last:after:hidden ${isMoment ? "bg-primary/5" : "bg-card"}`}
+        last:before:hidden last:after:hidden ${isMoment ? "bg-primary/10" : "bg-card"}`}
     >
       <Button
         ref={handleRef}
