@@ -380,7 +380,7 @@ function SortablePlanItem({ item, index, onRemove, onDurationChange }: {
   return (
     <li
       ref={ref}
-      className={`relative flex items-center gap-2 rounded-xl border p-2 shadow-sm
+      className={`relative grid grid-cols-[auto_auto_minmax(0,1fr)_auto] items-center gap-2 rounded-xl border p-2 shadow-sm
         after:pointer-events-none after:absolute after:top-full after:left-6 after:h-4 after:w-px after:bg-primary/55
         before:pointer-events-none before:absolute before:top-[calc(100%+0.3rem)] before:left-[1.25rem] before:z-10 before:size-2 before:rounded-full before:border before:border-primary before:bg-card
         last:before:hidden last:after:hidden ${isMoment ? "bg-primary/5" : "bg-card"}`}
@@ -405,28 +405,29 @@ function SortablePlanItem({ item, index, onRemove, onDurationChange }: {
           </span>
         )}
         <p className="text-sm font-semibold wrap-break-word">{title}</p>
-        {(isMoment || item.pin) && (
-          <label className="inline-flex max-w-full flex-wrap items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
-            <Clock aria-hidden="true" className="size-3.5" />
-            {isMoment ? "時間" : "滞在"}
-            <Input
-              type="number"
-              className="h-6 w-12 bg-card px-1.5 text-xs"
-              min={0}
-              step="any"
-              value={item.durationMinutes ?? ""}
-              onChange={(event) => {
-                const value = event.target.valueAsNumber;
-                onDurationChange(Number.isFinite(value) && value >= 0 ? value : null);
-              }}
-            />
-            分
-          </label>
-        )}
       </div>
       <Button type="button" variant="ghost" size="icon-sm" className="shrink-0 self-start" aria-label={`${title}を削除`} onClick={onRemove}>
         <Trash2 aria-hidden="true" />
       </Button>
+      {(isMoment || item.pin) && (
+        <label className="col-span-3 col-start-2 inline-flex w-fit items-center gap-1 rounded-full bg-muted px-1.5 py-0.5 text-xs whitespace-nowrap text-muted-foreground">
+          <Clock aria-hidden="true" className="size-3.5 shrink-0" />
+          <span>{isMoment ? "時間" : "滞在"}</span>
+          <Input
+            type="number"
+            className="h-6 w-14 shrink-0 bg-card px-1 text-xs"
+            placeholder="例：30"
+            min={0}
+            step="any"
+            value={item.durationMinutes ?? ""}
+            onChange={(event) => {
+              const value = event.target.valueAsNumber;
+              onDurationChange(Number.isFinite(value) && value >= 0 ? value : null);
+            }}
+          />
+          <span>分</span>
+        </label>
+      )}
     </li>
   );
 }
