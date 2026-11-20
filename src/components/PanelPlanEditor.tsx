@@ -7,7 +7,7 @@ import Uppy from "@uppy/core";
 import { format, isValid, parseISO } from "date-fns";
 import emojiRegex from "emoji-regex";
 import EmojiPicker, { EmojiStyle } from "emoji-picker-react";
-import { ArrowDown, ArrowLeft, Ellipsis, GripVertical, Image, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowLeft, Clock, Ellipsis, GripVertical, Image, MapPin, Trash2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -23,9 +23,10 @@ import type { Pin, Plan, PlanItem } from "@/types";
 
 const momentSuggestions = ["移動", "待ち合わせ", "休憩", "食事"];
 const suggestedEmojis = [
-  { emoji: "🚃", label: "電車" }, { emoji: "🚗", label: "車" },
-  { emoji: "🗺️", label: "地図" }, { emoji: "🏞️", label: "風景" },
-  { emoji: "☕", label: "カフェ" },
+  { emoji: "⛩️", label: "神社" }, { emoji: "🌳", label: "公園" },
+  { emoji: "☕", label: "カフェ" }, { emoji: "📷", label: "写真" },
+  { emoji: "🌸", label: "桜" }, { emoji: "🍜", label: "ラーメン" },
+  { emoji: "🗼", label: "タワー" },
 ];
 const maxImageSize = 5 * 1024 * 1024;
 const inputClass = "border-border bg-card";
@@ -161,7 +162,7 @@ function PlanEditorForm({ plan, onBack, onSave }: PanelPlanEditorProps) {
     <section className="space-y-4 p-4" aria-labelledby={`${formId}-heading`}>
       <header className="space-y-2">
         <div className="flex items-center gap-2">
-          <Button type="button" variant="ghost" size="icon" aria-label="戻る" onClick={onBack}>
+          <Button type="button" variant="outline" size="icon" aria-label="戻る" onClick={onBack}>
             <ArrowLeft aria-hidden="true" />
           </Button>
           <h2 id={`${formId}-heading`} className="flex-1 text-lg font-semibold">
@@ -196,16 +197,27 @@ function PlanEditorForm({ plan, onBack, onSave }: PanelPlanEditorProps) {
           <Button
             type="button"
             variant="outline"
-            className="h-auto min-h-20 w-full justify-center rounded-lg border-dashed bg-card px-3 py-2 whitespace-normal"
-            aria-describedby={`${formId}-image-hint`}
+            className="h-auto min-h-24 w-full flex-col gap-1 rounded-xl border-dashed border-primary/35 bg-primary/5 px-3 py-2 whitespace-normal hover:bg-primary/10"
             onClick={() => imageInput.current?.click()}
+            onDragOver={(event) => event.preventDefault()}
+            onDrop={(event) => {
+              event.preventDefault();
+              const { files } = event.dataTransfer;
+              if (files.length > 1) {
+                setImageError("画像は1枚だけ選択してください。");
+              } else if (files[0]) {
+                chooseImage(files[0]);
+              }
+            }}
           >
-            <Image aria-hidden="true" className="shrink-0" />
+            <Image aria-hidden="true" className="size-6 shrink-0 text-primary" />
             <span className="min-w-0 wrap-break-word">
-              {imageName || (plan?.images.length ? "登録済みの画像を変更" : "画像を選択")}
+              {imageName || (plan?.images.length ? "登録済みの画像を変更" : "クリックして画像を選択")}
+            </span>
+            <span className="text-xs font-normal text-muted-foreground">
+              または、ここにドラッグ＆ドロップ（1枚・5MB以下）
             </span>
           </Button>
-          <p id={`${formId}-image-hint`} className="text-xs text-muted-foreground">任意・1枚まで・5MB以下</p>
           {imageName && (
             <Button type="button" variant="ghost" size="sm" onClick={() => {
               const [file] = uppy.getFiles();
@@ -219,11 +231,12 @@ function PlanEditorForm({ plan, onBack, onSave }: PanelPlanEditorProps) {
           {imageError && <p role="alert" className="text-sm text-destructive">{imageError}</p>}
         </div>
         <div className="space-y-1">
-          <label htmlFor={`${formId}-title`}>旅行計画名 <span className="text-xs text-destructive">必須</span></label>
-          <Input id={`${formId}-title`} required className={inputClass} aria-invalid={!!errors.title} {...register("title")} />
+          <label className="text-sm font-semibold" htmlFor={`${formId}-title`}>タイトル <span aria-hidden="true" className="text-destructive">*</span></label>
+          <Input id={`${formId}-title`} required placeholder="旅行計画名を入力" className={`rounded-lg ${inputClass}`} aria-invalid={!!errors.title} {...register("title")} />
           {errors.title && <p role="alert" className="text-sm text-destructive">{errors.title.message}</p>}
         </div>
         <div className="space-y-2">
+          <p className="text-sm font-semibold">絵文字</p>
           <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label="絵文字">
             {suggestedEmojis.map(({ emoji: option, label }) => (
               <Button
@@ -233,7 +246,7 @@ function PlanEditorForm({ plan, onBack, onSave }: PanelPlanEditorProps) {
                 size="icon"
                 aria-label={label}
                 aria-pressed={emoji === option}
-                className="bg-card text-base aria-pressed:border-primary aria-pressed:bg-primary/10"
+                className="h-9 w-10 rounded-full bg-card text-base aria-pressed:border-primary aria-pressed:bg-primary/10"
                 onClick={() => setValue("emoji", option, { shouldValidate: true })}
               >
                 {option}
@@ -242,7 +255,7 @@ function PlanEditorForm({ plan, onBack, onSave }: PanelPlanEditorProps) {
             {emoji && !suggestedEmojis.some(({ emoji: option }) => option === emoji) && (
               <span className="px-1 text-lg" aria-label="選択中の絵文字">{emoji}</span>
             )}
-            <Button type="button" variant="outline" size="icon" className="bg-card" aria-label="その他の絵文字" aria-expanded={showEmojiPicker} onClick={() => setShowEmojiPicker(!showEmojiPicker)}>
+            <Button type="button" variant="outline" size="icon" className="h-9 w-10 rounded-full bg-card" aria-label="その他の絵文字" aria-expanded={showEmojiPicker} onClick={() => setShowEmojiPicker(!showEmojiPicker)}>
               <Ellipsis aria-hidden="true" />
             </Button>
           </div>
@@ -260,44 +273,30 @@ function PlanEditorForm({ plan, onBack, onSave }: PanelPlanEditorProps) {
           {errors.emoji && <p role="alert" className="text-sm text-destructive">{errors.emoji.message}</p>}
         </div>
         <div className="space-y-1">
-          <label htmlFor={`${formId}-body`}>説明</label>
-          <Textarea id={`${formId}-body`} rows={3} className={inputClass} {...register("body")} />
+          <label className="text-sm font-semibold" htmlFor={`${formId}-body`}>説明</label>
+          <Textarea id={`${formId}-body`} rows={3} placeholder="旅行の概要や見どころを入力" className={`rounded-lg ${inputClass}`} {...register("body")} />
         </div>
 
-        <div className="space-y-2">
-          <h3 className="font-medium">立ち寄り先・ひとコマ</h3>
-          <DragDropProvider onDragEnd={(event) => {
-            if (!event.canceled) setItems((previous) => move(previous, event));
-          }}>
-            <ol className="space-y-2">
-              {items.map((item, index) => (
-                <SortablePlanItem
-                  key={item.id}
-                  item={item}
-                  index={index}
-                  onRemove={() => setItems((previous) => previous.filter(({ id }) => id !== item.id))}
-                  onDurationChange={(durationMinutes) => setItems((previous) =>
-                    previous.map((entry) => entry.id === item.id ? { ...entry, durationMinutes } : entry),
-                  )}
-                />
-              ))}
-            </ol>
-          </DragDropProvider>
+        <div className="flex flex-col gap-3 border-t pt-4">
+          <h3 className="text-base font-semibold">立ち寄り先・ひとコマ</h3>
 
-          <label htmlFor={`${formId}-pin`} className="block text-sm">追加するピン</label>
-          <div className="flex items-center gap-2">
-            <select id={`${formId}-pin`} value={selectedPin} onChange={(event) => setSelectedPin(event.target.value)} className="h-9 min-w-0 flex-1 rounded-lg border bg-card px-2 text-sm">
-              <option value="">選択してください</option>
-              {availablePins?.map((pin) => <option key={pin.id} value={pin.id}>{pin.title}</option>)}
-            </select>
-            <Button type="button" variant="outline" disabled={!selectedPin} onClick={addPin}>ピンを追加</Button>
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="relative min-w-28 flex-1">
+              <MapPin aria-hidden="true" className="pointer-events-none absolute top-1/2 left-2 size-4 -translate-y-1/2 text-primary" />
+              <select aria-label="追加するピン" value={selectedPin} onChange={(event) => setSelectedPin(event.target.value)} className="h-9 w-full rounded-lg border bg-card pr-1 pl-7 text-sm">
+                <option value="">ピンを選択</option>
+                {availablePins?.map((pin) => <option key={pin.id} value={pin.id}>{pin.title}</option>)}
+              </select>
+            </div>
+            <Button type="button" variant="outline" className="rounded-lg border-primary/60 bg-primary/5 text-primary" disabled={!selectedPin} onClick={addPin}>
+              <MapPin aria-hidden="true" />ピンを追加
+            </Button>
+            <Button type="button" variant="outline" className="rounded-lg" aria-expanded={showMoment} onClick={() => setShowMoment(!showMoment)}>
+              <ArrowDown aria-hidden="true" />ひとコマを追加
+            </Button>
           </div>
           {pinLoadFailed && <p role="alert" className="text-sm text-destructive">ピンを読み込めませんでした。</p>}
           {!pinOptions && !pinLoadFailed && <p role="status" className="text-sm">ピンを読み込み中…</p>}
-          <Button type="button" variant="outline" aria-expanded={showMoment} onClick={() => setShowMoment(!showMoment)}>
-            <ArrowDown aria-hidden="true" />
-            ひとコマを追加
-          </Button>
           {showMoment && (
             <div className="space-y-2">
               <label htmlFor={`${formId}-moment`}>ひとコマの名前</label>
@@ -322,6 +321,25 @@ function PlanEditorForm({ plan, onBack, onSave }: PanelPlanEditorProps) {
               <Button type="button" variant="outline" disabled={!momentTitle.trim()} onClick={addMoment}>行程に追加</Button>
             </div>
           )}
+          {items.length > 0 && (
+            <DragDropProvider onDragEnd={(event) => {
+              if (!event.canceled) setItems((previous) => move(previous, event));
+            }}>
+              <ol className="space-y-4">
+                {items.map((item, index) => (
+                  <SortablePlanItem
+                    key={item.id}
+                    item={item}
+                    index={index}
+                    onRemove={() => setItems((previous) => previous.filter(({ id }) => id !== item.id))}
+                    onDurationChange={(durationMinutes) => setItems((previous) =>
+                      previous.map((entry) => entry.id === item.id ? { ...entry, durationMinutes } : entry),
+                    )}
+                  />
+                ))}
+              </ol>
+            </DragDropProvider>
+          )}
         </div>
 
         {hasDraftPin && <p className="text-sm text-muted-foreground">下書きのピンを含む旅行計画は公開できません。</p>}
@@ -344,25 +362,34 @@ function SortablePlanItem({ item, index, onRemove, onDurationChange }: {
   onDurationChange: (durationMinutes: number | null) => void;
 }) {
   const { ref, handleRef } = useSortable({ id: item.id, index });
-  const title = item.type === "moment" ? item.title : item.pin?.title ?? "ピンが見つかりません";
+  const isMoment = item.type === "moment";
+  const title = isMoment ? item.title : item.pin?.title ?? "ピンが見つかりません";
   return (
-    <li ref={ref} className={`flex items-center gap-1 rounded-lg border p-2 ${item.type === "moment" ? "bg-muted" : "bg-card"}`}>
+    <li
+      ref={ref}
+      className={`relative flex items-center gap-2 rounded-xl border p-2 shadow-sm
+        after:pointer-events-none after:absolute after:top-full after:left-6 after:h-4 after:w-px after:bg-primary/55
+        before:pointer-events-none before:absolute before:top-[calc(100%+0.3rem)] before:left-[1.25rem] before:z-10 before:size-2 before:rounded-full before:border before:border-primary before:bg-card
+        last:before:hidden last:after:hidden ${isMoment ? "bg-primary/5" : "bg-card"}`}
+    >
       <Button ref={handleRef} type="button" variant="ghost" size="icon-sm" className="shrink-0 cursor-grab touch-none" aria-label={`${title}を並べ替える`}>
         <GripVertical aria-hidden="true" />
       </Button>
-      <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-2 gap-y-1">
-        <span className="flex min-w-0 flex-[1_1_6rem] items-start gap-1.5 text-sm">
-          {item.type === "moment" ? <ArrowDown aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-muted-foreground" /> : (
-            <span aria-hidden="true" className="shrink-0">{item.pin?.emoji}</span>
-          )}
-          <span className="min-w-0 wrap-break-word">{title}</span>
+      <span aria-hidden="true" className={`grid size-11 shrink-0 place-items-center rounded-xl text-2xl ${isMoment ? "bg-primary/15" : "bg-primary/5"}`}>
+        {isMoment ? <ArrowDown className="size-5" /> : item.pin?.emoji || <MapPin className="size-5" />}
+      </span>
+      <div className="min-w-0 flex-1 space-y-1">
+        <span className="inline-block rounded-full bg-primary/10 px-2 py-0.5 text-xs text-foreground">
+          {isMoment ? "ひとコマ" : "立ち寄り"}
         </span>
-        {(item.type === "moment" || item.pin) && (
-          <label className="flex shrink-0 items-center gap-1 text-xs text-muted-foreground">
-            {item.type === "moment" ? "時間" : "滞在"}
+        <p className="text-sm font-semibold wrap-break-word">{title}</p>
+        {(isMoment || item.pin) && (
+          <label className="inline-flex max-w-full flex-wrap items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
+            <Clock aria-hidden="true" className="size-3.5" />
+            {isMoment ? "時間" : "滞在"}
             <Input
               type="number"
-              className={`h-7 w-14 px-2 text-xs ${inputClass}`}
+              className="h-6 w-12 bg-card px-1.5 text-xs"
               min={0}
               step="any"
               value={item.durationMinutes ?? ""}
@@ -375,7 +402,7 @@ function SortablePlanItem({ item, index, onRemove, onDurationChange }: {
           </label>
         )}
       </div>
-      <Button type="button" variant="ghost" size="icon-sm" className="shrink-0" aria-label={`${title}を削除`} onClick={onRemove}>
+      <Button type="button" variant="ghost" size="icon-sm" className="shrink-0 self-start" aria-label={`${title}を削除`} onClick={onRemove}>
         <Trash2 aria-hidden="true" />
       </Button>
     </li>
