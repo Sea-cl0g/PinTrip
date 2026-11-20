@@ -197,7 +197,7 @@ function PlanEditorForm({ plan, onBack, onSave }: PanelPlanEditorProps) {
           <Button
             type="button"
             variant="outline"
-            className="h-auto min-h-24 w-full flex-col gap-1 rounded-xl border-dashed border-primary/35 bg-primary/5 px-3 py-2 whitespace-normal hover:bg-primary/10"
+            className="h-auto min-h-24 w-full flex-col gap-1 rounded-xl border-dashed border-primary/35 bg-card px-3 py-2 whitespace-normal hover:border-primary hover:bg-card"
             onClick={() => imageInput.current?.click()}
             onDragOver={(event) => event.preventDefault()}
             onDrop={(event) => {
