@@ -379,9 +379,11 @@ function SortablePlanItem({ item, index, onRemove, onDurationChange }: {
         {isMoment ? <ArrowDown className="size-5" /> : item.pin?.emoji || <MapPin className="size-5" />}
       </span>
       <div className="min-w-0 flex-1 space-y-1">
-        <span className="inline-block rounded-full bg-primary/10 px-2 py-0.5 text-xs text-foreground">
-          {isMoment ? "ひとコマ" : "立ち寄り"}
-        </span>
+        {!isMoment && (
+          <span className="inline-block rounded-full bg-primary/10 px-2 py-0.5 text-xs text-foreground">
+            立ち寄り
+          </span>
+        )}
         <p className="text-sm font-semibold wrap-break-word">{title}</p>
         {(isMoment || item.pin) && (
           <label className="inline-flex max-w-full flex-wrap items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
