@@ -35,7 +35,7 @@ const planSchema = z.object({
   title: z.string().trim().min(1, "旅行計画名を入力してください。"),
   body: z.string(),
   emoji: z.string().refine(
-    (value) => value === "" || emojiRegex().exec(value)?.[0] === value,
+    (value) => emojiRegex().exec(value)?.[0] === value,
     "絵文字を1つ選んでください。",
   ),
 });
@@ -236,8 +236,16 @@ function PlanEditorForm({ plan, onBack, onSave }: PanelPlanEditorProps) {
           {errors.title && <p role="alert" className="text-sm text-destructive">{errors.title.message}</p>}
         </div>
         <div className="space-y-2">
-          <p className="text-sm font-semibold">絵文字</p>
-          <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label="絵文字">
+          <p id={`${formId}-emoji-label`} className="text-sm font-semibold">
+            絵文字 <span aria-hidden="true" className="text-destructive">*</span>
+            <span className="sr-only">（必須）</span>
+          </p>
+          <div
+            className="flex flex-wrap items-center gap-1.5"
+            role="group"
+            aria-labelledby={`${formId}-emoji-label`}
+            aria-describedby={errors.emoji ? `${formId}-emoji-error` : undefined}
+          >
             {suggestedEmojis.map(({ emoji: option, label }) => (
               <Button
                 key={option}
@@ -270,7 +278,7 @@ function PlanEditorForm({ plan, onBack, onSave }: PanelPlanEditorProps) {
               }}
             />
           )}
-          {errors.emoji && <p role="alert" className="text-sm text-destructive">{errors.emoji.message}</p>}
+          {errors.emoji && <p id={`${formId}-emoji-error`} role="alert" className="text-sm text-destructive">{errors.emoji.message}</p>}
         </div>
         <div className="space-y-1">
           <label className="text-sm font-semibold" htmlFor={`${formId}-body`}>説明</label>
