@@ -14,6 +14,12 @@ type PlanListState =
   | { status: "error" }
   | { status: "ready"; plans: Plan[] };
 
+const publicationDateFormatter = new Intl.DateTimeFormat("ja-JP", {
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+});
+
 export function PanelPlanList({ currentUserId, onSelectPlan }: PanelPlanListProps) {
   const titleId = useId();
   const [state, setState] = useState<PlanListState>({ status: "loading" });
@@ -68,14 +74,24 @@ export function PanelPlanList({ currentUserId, onSelectPlan }: PanelPlanListProp
             const isStarred = starredPlanIds.includes(plan.id);
 
             return (
-              <li key={plan.id} className="flex items-start gap-2 rounded-lg border p-2">
+              <li key={plan.id} className="space-y-1 rounded-lg border p-2">
                 <button
                   type="button"
-                  className="min-w-0 flex-1 cursor-pointer rounded-md p-2 text-left wrap-break-word hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring"
+                  className="block w-full cursor-pointer rounded-md p-2 text-left wrap-break-word hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring"
                   onClick={() => onSelectPlan(plan)}
                 >
-                  <span className="block font-medium">
-                    <span aria-hidden="true">{plan.emoji} </span>{plan.title}
+                  <span className="flex items-start gap-2">
+                    {plan.emoji && (
+                      <span aria-hidden="true" className="shrink-0 text-3xl leading-10">{plan.emoji}</span>
+                    )}
+                    <span className="min-w-0">
+                      <span className="block font-medium">{plan.title}</span>
+                      {plan.publishedAt && (
+                        <time dateTime={plan.publishedAt} className="block text-xs text-muted-foreground">
+                          {publicationDateFormatter.format(new Date(plan.publishedAt))}
+                        </time>
+                      )}
+                    </span>
                   </span>
                   {plan.body && (
                     <span className="mt-1 block font-diary text-sm text-muted-foreground">{plan.body}</span>
@@ -87,6 +103,9 @@ export function PanelPlanList({ currentUserId, onSelectPlan }: PanelPlanListProp
                   isLiked={isStarred}
                   onClick={() => toggleStar(plan.id)}
                 />
+                <p className="px-2 pb-1 text-xs text-muted-foreground wrap-break-word">
+                  by {plan.author.displayName}
+                </p>
               </li>
             );
           })}
