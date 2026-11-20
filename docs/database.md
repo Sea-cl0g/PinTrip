@@ -93,7 +93,7 @@ users (1) ── (N) pins (1) ── (N) pin_images
 | `updated_at` | TEXT | 更新日時 |
 | `published_at` | TEXT | 公開日時 |
 
-旅行計画の画像の枚数・アップロード規則は未決定。
+旅行計画の画像は1枚まで（任意）。
 
 ### plan_items
 
