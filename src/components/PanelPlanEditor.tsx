@@ -417,12 +417,12 @@ function SortablePlanItem({ item, index, onRemove, onDurationChange }: {
         )}
         <p className="text-sm font-semibold wrap-break-word">{title}</p>
         {(isMoment || item.pin) && (
-          <label className="inline-flex max-w-full flex-wrap items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
-            <Clock aria-hidden="true" className="size-3.5" />
+          <label className="inline-flex max-w-full items-center gap-0.5 rounded-full bg-muted px-1.5 py-0.5 text-xs whitespace-nowrap text-muted-foreground">
+            <Clock aria-hidden="true" className="size-3 shrink-0" />
             {isMoment ? "時間" : "滞在"}
             <Input
               type="number"
-              className="h-6 w-12 bg-card px-1.5 text-xs"
+              className="h-6 w-10 appearance-textfield bg-card px-1 text-center text-xs tabular-nums [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
               min={0}
               step="any"
               value={item.durationMinutes ?? ""}
