@@ -329,6 +329,11 @@ function PlanEditorForm({ plan, onBack, onSave }: PanelPlanEditorProps) {
               <Button type="button" variant="outline" disabled={!momentTitle.trim()} onClick={addMoment}>行程に追加</Button>
             </div>
           )}
+          {items.length > 1 && (
+            <p className="flex items-center gap-1 text-xs text-muted-foreground">
+              左の <GripVertical aria-hidden="true" className="size-4 shrink-0" /> をドラッグして並べ替え
+            </p>
+          )}
           {items.length > 0 && (
             <DragDropProvider onDragEnd={(event) => {
               if (!event.canceled) setItems((previous) => move(previous, event));
@@ -380,7 +385,14 @@ function SortablePlanItem({ item, index, onRemove, onDurationChange }: {
         before:pointer-events-none before:absolute before:top-[calc(100%+0.3rem)] before:left-[1.25rem] before:z-10 before:size-2 before:rounded-full before:border before:border-primary before:bg-card
         last:before:hidden last:after:hidden ${isMoment ? "bg-primary/5" : "bg-card"}`}
     >
-      <Button ref={handleRef} type="button" variant="ghost" size="icon-sm" className="shrink-0 cursor-grab touch-none" aria-label={`${title}を並べ替える`}>
+      <Button
+        ref={handleRef}
+        type="button"
+        variant="ghost"
+        size="icon-sm"
+        className="shrink-0 cursor-grab touch-none rounded-lg hover:bg-primary/10 focus-visible:bg-primary/10 active:cursor-grabbing active:bg-primary/15"
+        aria-label={`${title}を並べ替える`}
+      >
         <GripVertical aria-hidden="true" />
       </Button>
       <span aria-hidden="true" className={`grid size-11 shrink-0 place-items-center rounded-xl text-2xl ${isMoment ? "bg-primary/15" : "bg-primary/5"}`}>
