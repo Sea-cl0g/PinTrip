@@ -3,10 +3,12 @@ import { ArrowDown, Clock } from "lucide-react";
 
 import { getPlans } from "@/api/mock-api";
 import { StarButton } from "@/components/StarButton";
-import type { Plan } from "@/types";
+import type { Pin, Plan, PlanPinItem } from "@/types";
 
 type PanelPlanDetailProps = {
   planId: number;
+  selectedPinId?: number;
+  onSelectPin?: (pin: Pin) => void;
 };
 
 type DetailState =
@@ -19,11 +21,11 @@ const publicationDateFormatter = new Intl.DateTimeFormat("ja-JP", {
   day: "2-digit",
 });
 
-export function PanelPlanDetail({ planId }: PanelPlanDetailProps) {
-  return <PlanDetailContent key={planId} planId={planId} />;
+export function PanelPlanDetail(props: PanelPlanDetailProps) {
+  return <PlanDetailContent key={props.planId} {...props} />;
 }
 
-function PlanDetailContent({ planId }: PanelPlanDetailProps) {
+function PlanDetailContent({ planId, selectedPinId, onSelectPin }: PanelPlanDetailProps) {
   const titleId = useId();
   const [state, setState] = useState<DetailState>({ status: "loading" });
   const [isLiked, setIsLiked] = useState(false);
@@ -100,37 +102,94 @@ function PlanDetailContent({ planId }: PanelPlanDetailProps) {
       {items.length === 0 ? (
         <p className="text-sm text-muted-foreground">登録された項目はありません。</p>
       ) : (
-        <ol aria-label="旅行計画の行程" className="space-y-2">
+        <ol role="list" aria-label="旅行計画の行程" className="space-y-1">
           {items.map((item) => {
             if (item.type === "moment") {
               return (
-                <li key={item.id} className="flex items-start gap-2 px-3 text-sm text-muted-foreground">
+                <li key={item.id} className="flex items-center justify-center gap-2 px-3 text-xs text-muted-foreground">
                   <ArrowDown aria-hidden="true" className="size-4 shrink-0" />
-                  <span className="min-w-0 flex-1 wrap-break-word">{item.title}</span>
-                  {item.durationMinutes !== null && <span className="shrink-0">{item.durationMinutes}分</span>}
+                  <span className="min-w-0 rounded-full bg-muted px-3 py-1 wrap-break-word">
+                    {item.title}{item.durationMinutes !== null && ` ${item.durationMinutes}分`}
+                  </span>
                 </li>
               );
             }
 
-            const number = ++pinNumber;
             return (
-              <li key={item.id} className="flex items-start gap-2 rounded-lg border p-3">
-                <span className="shrink-0 tabular-nums">{number}.</span>
-                {item.pin?.emoji && <span aria-hidden="true" className="shrink-0">{item.pin.emoji}</span>}
-                <span className="min-w-0 flex-1 wrap-break-word">
-                  {item.pin?.title ?? "ピンが見つかりません"}
-                </span>
-                {item.durationMinutes !== null && (
-                  <span className="flex shrink-0 items-center gap-1 text-xs text-muted-foreground">
-                    <Clock aria-hidden="true" className="size-4" />
-                    滞在 {item.durationMinutes}分
-                  </span>
-                )}
-              </li>
+              <PlanStop
+                key={item.id}
+                item={item}
+                number={++pinNumber}
+                selectedPinId={selectedPinId}
+                onSelectPin={onSelectPin}
+              />
             );
           })}
         </ol>
       )}
     </section>
+  );
+}
+
+function PlanStop({ item, number, selectedPinId, onSelectPin }: {
+  item: PlanPinItem;
+  number: number;
+  selectedPinId?: number;
+  onSelectPin?: (pin: Pin) => void;
+}) {
+  const { pin, durationMinutes } = item;
+  const cardClass = "flex min-h-11 w-full items-center gap-2 rounded-lg border px-2.5 py-2 text-left text-sm";
+  const actionClass = `${cardClass} cursor-pointer hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring`;
+  const content = (
+    <>
+      <span className="w-5 shrink-0 font-semibold tabular-nums">{number}</span>
+      <span aria-hidden="true" className="w-6 shrink-0 text-center text-lg leading-none">{pin?.emoji}</span>
+      <span className="flex min-w-0 flex-1 flex-wrap items-center justify-between gap-x-2 gap-y-1">
+        <span className="min-w-0 flex-[1_1_6rem] font-semibold wrap-break-word">
+          {pin?.title ?? "ピンが見つかりません"}
+        </span>
+        {durationMinutes !== null && (
+          <span className="inline-flex items-center gap-1 text-xs whitespace-nowrap text-muted-foreground">
+            <Clock aria-hidden="true" className="size-3.5" />
+            滞在 {durationMinutes}分
+          </span>
+        )}
+      </span>
+    </>
+  );
+
+  if (!pin) {
+    return <li className={`${cardClass} text-muted-foreground`}>{content}</li>;
+  }
+
+  if (onSelectPin) {
+    const isSelected = pin.id === selectedPinId;
+    return (
+      <li>
+        <button
+          type="button"
+          aria-pressed={isSelected}
+          className={`${actionClass} aria-pressed:border-primary aria-pressed:bg-primary/10`}
+          onClick={() => onSelectPin(pin)}
+        >
+          {content}
+        </button>
+      </li>
+    );
+  }
+
+  const query = encodeURIComponent(`${pin.latitude},${pin.longitude}`);
+  return (
+    <li>
+      <a
+        href={`https://www.google.com/maps/search/?api=1&query=${query}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={actionClass}
+        aria-label={`${pin.title}をGoogle マップで開く（新しいタブ）`}
+      >
+        {content}
+      </a>
+    </li>
   );
 }
