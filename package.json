@@ -31,8 +31,6 @@
     "@hookform/resolvers": "^7.0.7",
     "@tailwindcss/vite": "^4.3.5",
     "@uppy/core": "^6.3.2",
-    "@uppy/dashboard": "^6.0.3",
-    "@uppy/react": "^6.1.1",
     "class-variance-authority": "^0.7.1",
     "cn": "^0.5.2",
     "date-fns": "^4.4.0",

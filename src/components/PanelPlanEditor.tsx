@@ -1,24 +1,34 @@
-import { useEffect, useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { move } from "@dnd-kit/helpers";
 import { DragDropProvider } from "@dnd-kit/react";
 import { useSortable } from "@dnd-kit/react/sortable";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Uppy from "@uppy/core";
-import Dashboard from "@uppy/react/dashboard";
 import { format, isValid, parseISO } from "date-fns";
 import emojiRegex from "emoji-regex";
 import EmojiPicker, { EmojiStyle } from "emoji-picker-react";
-import { ArrowLeft, GripVertical, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowLeft, Ellipsis, GripVertical, Image, Trash2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { getPins } from "@/api/mock-api";
 import { StarButton } from "@/components/StarButton";
 import { Button } from "@/components/ui/button";
+import {
+  Combobox, ComboboxContent, ComboboxEmpty, ComboboxInput, ComboboxItem, ComboboxList,
+} from "@/components/ui/combobox";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import type { Pin, Plan, PlanItem } from "@/types";
-import "@uppy/core/css/style.css";
-import "@uppy/dashboard/css/style.css";
+
+const momentSuggestions = ["移動", "待ち合わせ", "休憩", "食事"];
+const suggestedEmojis = [
+  { emoji: "🚃", label: "電車" }, { emoji: "🚗", label: "車" },
+  { emoji: "🗺️", label: "地図" }, { emoji: "🏞️", label: "風景" },
+  { emoji: "☕", label: "カフェ" },
+];
+const maxImageSize = 5 * 1024 * 1024;
+const inputClass = "border-border bg-card";
 
 const planSchema = z.object({
   title: z.string().trim().min(1, "旅行計画名を入力してください。"),
@@ -64,11 +74,14 @@ function PlanEditorForm({ plan, onBack, onSave }: PanelPlanEditorProps) {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [feedback, setFeedback] = useState("");
   const [isStarred, setIsStarred] = useState(false);
+  const imageInput = useRef<HTMLInputElement>(null);
+  const [imageName, setImageName] = useState("");
+  const [imageError, setImageError] = useState("");
   const [uppy] = useState(() => new Uppy({
     restrictions: {
       allowedFileTypes: ["image/*"],
-      maxFileSize: 5 * 1024 * 1024,
-      maxNumberOfFiles: Math.max(0, 3 - (plan?.images.length ?? 0)),
+      maxFileSize: maxImageSize,
+      maxNumberOfFiles: 1,
     },
   }));
 
@@ -112,6 +125,23 @@ function PlanEditorForm({ plan, onBack, onSave }: PanelPlanEditorProps) {
     setShowMoment(false);
   }
 
+  function chooseImage(file: File) {
+    if (!file.type.startsWith("image/") || file.type === "image/svg+xml" || /\.svgz?$/i.test(file.name)) {
+      setImageError("SVG以外の画像を選択してください。");
+      return;
+    }
+    if (file.size > maxImageSize) {
+      setImageError("5MB以下の画像を選択してください。");
+      return;
+    }
+
+    const [previousImage] = uppy.getFiles();
+    if (previousImage) uppy.removeFile(previousImage.id);
+    uppy.addFile({ name: file.name, type: file.type, data: file });
+    setImageName(file.name);
+    setImageError("");
+  }
+
   function save(status: Plan["status"]) {
     return handleSubmit((fields) => {
       if (status === "published" && hasDraftPin) return;
@@ -130,8 +160,13 @@ function PlanEditorForm({ plan, onBack, onSave }: PanelPlanEditorProps) {
   return (
     <section className="space-y-4 p-4" aria-labelledby={`${formId}-heading`}>
       <header className="space-y-2">
-        <div className="flex items-center justify-between gap-2">
-          <Button type="button" variant="ghost" onClick={onBack}><ArrowLeft />戻る</Button>
+        <div className="flex items-center gap-2">
+          <Button type="button" variant="ghost" size="icon" aria-label="戻る" onClick={onBack}>
+            <ArrowLeft aria-hidden="true" />
+          </Button>
+          <h2 id={`${formId}-heading`} className="flex-1 text-lg font-semibold">
+            {plan ? "旅行計画を編集" : "旅行計画を作成"}
+          </h2>
           {plan && (
             <StarButton
               count={Number(isStarred)}
@@ -140,28 +175,77 @@ function PlanEditorForm({ plan, onBack, onSave }: PanelPlanEditorProps) {
             />
           )}
         </div>
-        <h2 id={`${formId}-heading`} className="text-lg font-semibold">
-          {plan ? "旅行計画を編集" : "旅行計画を作成"}
-        </h2>
         {publishedDate && isValid(publishedDate) && (
           <p className="text-sm text-muted-foreground">公開日 {format(publishedDate, "yyyy/MM/dd")}</p>
         )}
       </header>
 
-      <form className="space-y-4" onSubmit={save("published")}>
+      <form className="space-y-4" noValidate onSubmit={save("published")}>
         <div className="space-y-1">
-          <label htmlFor={`${formId}-title`}>旅行計画名</label>
-          <Input id={`${formId}-title`} aria-invalid={!!errors.title} {...register("title")} />
+          <input
+            ref={imageInput}
+            type="file"
+            accept="image/*"
+            hidden
+            onChange={(event) => {
+              const file = event.currentTarget.files?.[0];
+              if (file) chooseImage(file);
+              event.currentTarget.value = "";
+            }}
+          />
+          <Button
+            type="button"
+            variant="outline"
+            className="h-auto min-h-20 w-full justify-center rounded-lg border-dashed bg-card px-3 py-2 whitespace-normal"
+            aria-describedby={`${formId}-image-hint`}
+            onClick={() => imageInput.current?.click()}
+          >
+            <Image aria-hidden="true" className="shrink-0" />
+            <span className="min-w-0 wrap-break-word">
+              {imageName || (plan?.images.length ? "登録済みの画像を変更" : "画像を選択")}
+            </span>
+          </Button>
+          <p id={`${formId}-image-hint`} className="text-xs text-muted-foreground">任意・1枚まで・5MB以下</p>
+          {imageName && (
+            <Button type="button" variant="ghost" size="sm" onClick={() => {
+              const [file] = uppy.getFiles();
+              if (file) uppy.removeFile(file.id);
+              setImageName("");
+              setImageError("");
+            }}>
+              選択を取り消す
+            </Button>
+          )}
+          {imageError && <p role="alert" className="text-sm text-destructive">{imageError}</p>}
+        </div>
+        <div className="space-y-1">
+          <label htmlFor={`${formId}-title`}>旅行計画名 <span className="text-xs text-destructive">必須</span></label>
+          <Input id={`${formId}-title`} required className={inputClass} aria-invalid={!!errors.title} {...register("title")} />
           {errors.title && <p role="alert" className="text-sm text-destructive">{errors.title.message}</p>}
         </div>
-        <div className="space-y-1">
-          <label htmlFor={`${formId}-body`}>説明</label>
-          <textarea id={`${formId}-body`} rows={3} className="w-full rounded-lg border bg-background p-2" {...register("body")} />
-        </div>
         <div className="space-y-2">
-          <Button type="button" variant="outline" aria-expanded={showEmojiPicker} onClick={() => setShowEmojiPicker(!showEmojiPicker)}>
-            {emoji ? `絵文字を変更 ${emoji}` : "絵文字を選択"}
-          </Button>
+          <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label="絵文字">
+            {suggestedEmojis.map(({ emoji: option, label }) => (
+              <Button
+                key={option}
+                type="button"
+                variant="outline"
+                size="icon"
+                aria-label={label}
+                aria-pressed={emoji === option}
+                className="bg-card text-base aria-pressed:border-primary aria-pressed:bg-primary/10"
+                onClick={() => setValue("emoji", option, { shouldValidate: true })}
+              >
+                {option}
+              </Button>
+            ))}
+            {emoji && !suggestedEmojis.some(({ emoji: option }) => option === emoji) && (
+              <span className="px-1 text-lg" aria-label="選択中の絵文字">{emoji}</span>
+            )}
+            <Button type="button" variant="outline" size="icon" className="bg-card" aria-label="その他の絵文字" aria-expanded={showEmojiPicker} onClick={() => setShowEmojiPicker(!showEmojiPicker)}>
+              <Ellipsis aria-hidden="true" />
+            </Button>
+          </div>
           {showEmojiPicker && (
             <EmojiPicker
               emojiStyle={EmojiStyle.NATIVE}
@@ -175,13 +259,9 @@ function PlanEditorForm({ plan, onBack, onSave }: PanelPlanEditorProps) {
           )}
           {errors.emoji && <p role="alert" className="text-sm text-destructive">{errors.emoji.message}</p>}
         </div>
-        <div className="space-y-2">
-          <h3 className="font-medium">画像</h3>
-          <p className="text-sm text-muted-foreground">最大3枚、1枚につき5MBまで</p>
-          {(plan?.images.length ?? 0) < 3 && (
-            <Dashboard uppy={uppy} width="100%" height={230} hideUploadButton />
-          )}
-          {!!plan?.images.length && <p className="text-sm">登録済みの画像 {plan.images.length}枚</p>}
+        <div className="space-y-1">
+          <label htmlFor={`${formId}-body`}>説明</label>
+          <Textarea id={`${formId}-body`} rows={3} className={inputClass} {...register("body")} />
         </div>
 
         <div className="space-y-2">
@@ -205,21 +285,41 @@ function PlanEditorForm({ plan, onBack, onSave }: PanelPlanEditorProps) {
           </DragDropProvider>
 
           <label htmlFor={`${formId}-pin`} className="block text-sm">追加するピン</label>
-          <select id={`${formId}-pin`} value={selectedPin} onChange={(event) => setSelectedPin(event.target.value)} className="w-full rounded-lg border bg-background p-2">
-            <option value="">選択してください</option>
-            {availablePins?.map((pin) => <option key={pin.id} value={pin.id}>{pin.title}</option>)}
-          </select>
+          <div className="flex items-center gap-2">
+            <select id={`${formId}-pin`} value={selectedPin} onChange={(event) => setSelectedPin(event.target.value)} className="h-9 min-w-0 flex-1 rounded-lg border bg-card px-2 text-sm">
+              <option value="">選択してください</option>
+              {availablePins?.map((pin) => <option key={pin.id} value={pin.id}>{pin.title}</option>)}
+            </select>
+            <Button type="button" variant="outline" disabled={!selectedPin} onClick={addPin}>ピンを追加</Button>
+          </div>
           {pinLoadFailed && <p role="alert" className="text-sm text-destructive">ピンを読み込めませんでした。</p>}
           {!pinOptions && !pinLoadFailed && <p role="status" className="text-sm">ピンを読み込み中…</p>}
-          <div className="flex flex-wrap gap-2">
-            <Button type="button" variant="outline" disabled={!selectedPin} onClick={addPin}>ピンを追加</Button>
-            <Button type="button" variant="outline" aria-expanded={showMoment} onClick={() => setShowMoment(!showMoment)}>ひとコマ</Button>
-          </div>
+          <Button type="button" variant="outline" aria-expanded={showMoment} onClick={() => setShowMoment(!showMoment)}>
+            <ArrowDown aria-hidden="true" />
+            ひとコマを追加
+          </Button>
           {showMoment && (
             <div className="space-y-2">
               <label htmlFor={`${formId}-moment`}>ひとコマの名前</label>
-              <Input id={`${formId}-moment`} value={momentTitle} onChange={(event) => setMomentTitle(event.target.value)} />
-              <Button type="button" variant="outline" disabled={!momentTitle.trim()} onClick={addMoment}>ひとコマを追加</Button>
+              <Combobox
+                items={momentSuggestions}
+                inputValue={momentTitle}
+                onInputValueChange={(value, details) => {
+                  if (details.reason === "input-change") setMomentTitle(value);
+                }}
+                onValueChange={(value) => {
+                  if (typeof value === "string") setMomentTitle(value);
+                }}
+              >
+                <ComboboxInput id={`${formId}-moment`} className={`w-full ${inputClass}`} placeholder="候補を選択、または入力" />
+                <ComboboxContent>
+                  <ComboboxEmpty>入力した名前で追加できます。</ComboboxEmpty>
+                  <ComboboxList>
+                    {(option: string) => <ComboboxItem key={option} value={option}>{option}</ComboboxItem>}
+                  </ComboboxList>
+                </ComboboxContent>
+              </Combobox>
+              <Button type="button" variant="outline" disabled={!momentTitle.trim()} onClick={addMoment}>行程に追加</Button>
             </div>
           )}
         </div>
@@ -246,18 +346,23 @@ function SortablePlanItem({ item, index, onRemove, onDurationChange }: {
   const { ref, handleRef } = useSortable({ id: item.id, index });
   const title = item.type === "moment" ? item.title : item.pin?.title ?? "ピンが見つかりません";
   return (
-    <li ref={ref} className="flex items-start gap-2 rounded-lg border p-2">
-      <Button ref={handleRef} type="button" variant="ghost" size="icon" className="cursor-grab touch-none" aria-label={`${title}を並べ替える`}>
-        <GripVertical />
+    <li ref={ref} className={`flex items-center gap-1 rounded-lg border p-2 ${item.type === "moment" ? "bg-muted" : "bg-card"}`}>
+      <Button ref={handleRef} type="button" variant="ghost" size="icon-sm" className="shrink-0 cursor-grab touch-none" aria-label={`${title}を並べ替える`}>
+        <GripVertical aria-hidden="true" />
       </Button>
-      <div className="min-w-0 flex-1 space-y-1">
-        <p className="text-xs text-muted-foreground">{item.type === "moment" ? "ひとコマ" : "立ち寄り先"}</p>
-        <p className="wrap-break-word">{title}</p>
+      <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-2 gap-y-1">
+        <span className="flex min-w-0 flex-[1_1_6rem] items-start gap-1.5 text-sm">
+          {item.type === "moment" ? <ArrowDown aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-muted-foreground" /> : (
+            <span aria-hidden="true" className="shrink-0">{item.pin?.emoji}</span>
+          )}
+          <span className="min-w-0 wrap-break-word">{title}</span>
+        </span>
         {(item.type === "moment" || item.pin) && (
-          <label className="block text-sm">
-            {item.type === "moment" ? "時間（分）" : "滞在時間（分）"}
+          <label className="flex shrink-0 items-center gap-1 text-xs text-muted-foreground">
+            {item.type === "moment" ? "時間" : "滞在"}
             <Input
               type="number"
+              className={`h-7 w-14 px-2 text-xs ${inputClass}`}
               min={0}
               step="any"
               value={item.durationMinutes ?? ""}
@@ -266,11 +371,12 @@ function SortablePlanItem({ item, index, onRemove, onDurationChange }: {
                 onDurationChange(Number.isFinite(value) && value >= 0 ? value : null);
               }}
             />
+            分
           </label>
         )}
       </div>
-      <Button type="button" variant="ghost" size="icon" aria-label={`${title}を削除`} onClick={onRemove}>
-        <Trash2 />
+      <Button type="button" variant="ghost" size="icon-sm" className="shrink-0" aria-label={`${title}を削除`} onClick={onRemove}>
+        <Trash2 aria-hidden="true" />
       </Button>
     </li>
   );
