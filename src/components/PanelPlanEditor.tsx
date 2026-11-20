@@ -422,9 +422,9 @@ function SortablePlanItem({ item, index, onRemove, onDurationChange }: {
             {isMoment ? "時間" : "滞在"}
             <Input
               type="number"
-              className="h-6 w-10 appearance-textfield bg-card px-1 text-center text-xs tabular-nums [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+              className="h-6 w-12 bg-card px-1 text-xs tabular-nums"
               min={0}
-              step="any"
+              step={1}
               value={item.durationMinutes ?? ""}
               onChange={(event) => {
                 const value = event.target.valueAsNumber;
